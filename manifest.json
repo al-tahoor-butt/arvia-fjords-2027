@@ -1,0 +1,17 @@
+{
+  "name": "Arvia Fjords 2027",
+  "short_name": "Arvia Cruise",
+  "description": "Family dashboard for the P&O Arvia Norwegian Fjords cruise, March 2027.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d1b2a",
+  "theme_color": "#415a77",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

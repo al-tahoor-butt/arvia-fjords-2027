@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#415a77">
+  <title>Arvia Fjords 2027</title>
+  
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./styles.css">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Splash Screen / Gatekeeper -->
+  <div id="splash-screen" class="splash-overlay hidden">
+    <div class="splash-card">
+      <i class="fa-solid fa-ship" style="font-size: 40px; color: var(--primary); margin-bottom: 15px;"></i>
+      <h1 class="splash-title">Arvia Fjords 2027</h1>
+      <p class="splash-subtitle">Butt/Penkett & Currie/Rowlands Families</p>
+      
+      <div class="splash-input-group">
+        <input type="password" id="passcode-input" placeholder="Enter Family Passcode" onkeydown="if(event.key==='Enter') unlockPortal()">
+        <button onclick="unlockPortal()">Unlock Itinerary</button>
+      </div>
+      <div id="splash-error" class="splash-error hidden"><i class="fa-solid fa-triangle-exclamation"></i> Incorrect passcode. (Hint: where are you going?)</div>
+      
+      <div class="viking-decor" style="font-size: 14px; letter-spacing: 5px; margin-top: 30px;">
+        ᚠᛃᛟᚱᛞᛊ
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App Portal -->
+  <div id="portal-content" class="hidden">
+    
+    <header class="app-header">
+      <div class="brand">
+        <i class="fa-brands fa-nfc-symbol brand-icon"></i>
+        <div>
+          <h1>P&O Arvia</h1>
+          <span class="subtitle">Norwegian Fjords &bull; Mar/Apr 2027</span>
+        </div>
+      </div>
+      
+      <div class="countdown-card">
+        <span class="countdown-label">Setting Sail In</span>
+        <div class="timer" id="countdown-timer">
+          <div class="unit"><span id="days">00</span><small>DAYS</small></div>
+          <div class="unit"><span id="hours">00</span><small>HRS</small></div>
+          <div class="unit"><span id="mins">00</span><small>MINS</small></div>
+          <div class="unit"><span id="secs">00</span><small>SECS</small></div>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <button onclick="lockPortal()"><i class="fa-solid fa-lock"></i> Lock</button>
+      </div>
+    </header>
+    
+    <div class="content-wrapper main-container">
+      
+      <!-- Left Column: Navigation & Sidebar info -->
+      <aside class="sidebar">
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="fa-regular fa-compass"></i> Itinerary</h2>
+          </div>
+          <div class="card-body" style="padding: 10px;">
+            <div id="day-list" class="day-list">
+              <!-- JS Populated -->
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="fa-solid fa-car-side"></i> Port Logistics</h2>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="logistics-tabs">
+              <button id="tab-greenfield" class="logistics-tab active" onclick="switchLogistics('greenfield')">Greenfield</button>
+              <button id="tab-cardiff" class="logistics-tab" onclick="switchLogistics('cardiff')">Cardiff</button>
+            </div>
+            <div id="logistics-content" class="logistics-content" style="padding: 15px;">
+              <!-- JS Populated -->
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="fa-solid fa-suitcase"></i> Fjords Packing Checklist</h2>
+            <small id="packing-progress" style="color: var(--primary);">0 of 8 Ready</small>
+          </div>
+          <div class="card-body">
+            <div id="packing-items" class="packing-list">
+              <!-- JS Populated -->
+            </div>
+          </div>
+        </div>
+      </aside>
+      
+      <!-- Right Column: Detail View -->
+      <main class="main-content">
+        <div class="card" id="day-details-card">
+          <!-- JS Populated -->
+        </div>
+      </main>
+      
+    </div>
+    
+  </div>
+
+  <script src="./app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.error('SW registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>
