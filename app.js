@@ -7,6 +7,8 @@ const cruiseData = [
     arrive: '12:00 PM Check-in',
     depart: '5:00 PM Sailing',
     highlight: 'Boarding the P&O Arvia!',
+    lat: 50.897,
+    lng: -1.404,
     heroImage: 'https://images.unsplash.com/photo-1599827552599-eadf5af3c6f2?auto=format&fit=crop&q=80&w=1000',
     weather: '10°C / Cloudy (Est)',
     activities: 'Explore the ship, check out the Altitude Skywalk, and enjoy the Sailaway party as we leave Southampton.',
@@ -19,6 +21,8 @@ const cruiseData = [
     arrive: '—',
     depart: '—',
     highlight: 'Cruising the North Sea',
+    lat: 54.0,
+    lng: 3.0,
     heroImage: 'https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&q=80&w=1000',
     weather: '8°C / Windy (Est)',
     activities: 'Relax in the Oasis Spa, catch a show in the Headliners Theatre, or brave the outdoor pools if heated!',
@@ -31,6 +35,8 @@ const cruiseData = [
     arrive: '8:00 AM',
     depart: '5:00 PM',
     highlight: 'Lysefjord & Pulpit Rock Views',
+    lat: 58.9699,
+    lng: 5.7331,
     heroImage: 'https://images.unsplash.com/photo-1513515438885-9372f6a9e1e3?auto=format&fit=crop&q=80&w=1000',
     weather: '6°C / Showers (Est)',
     activities: 'Wander through Gamle Stavanger (Old Town) with its white wooden houses, or take a fjord cruise to see Preikestolen.',
@@ -43,6 +49,8 @@ const cruiseData = [
     arrive: '8:00 AM',
     depart: '5:00 PM',
     highlight: 'Briksdal Glacier',
+    lat: 61.833,
+    lng: 6.816,
     heroImage: 'https://images.unsplash.com/photo-1626248967015-188b430d4cdb?auto=format&fit=crop&q=80&w=1000',
     weather: '5°C / Crisp (Est)',
     activities: 'Hike or take the Troll car up to the magnificent Briksdal Glacier. Witness the deep blue ice and waterfalls.',
@@ -55,6 +63,8 @@ const cruiseData = [
     arrive: '8:00 AM',
     depart: '5:00 PM',
     highlight: 'Art Nouveau Architecture & Seven Sisters Waterfall',
+    lat: 62.472,
+    lng: 6.154,
     heroImage: 'https://images.unsplash.com/photo-1601007421867-0c7f202298c9?auto=format&fit=crop&q=80&w=1000',
     weather: '6°C / Overcast (Est)',
     activities: 'Climb the 418 steps to the Mount Aksla viewpoint for a panoramic view of the islands and town.',
@@ -67,6 +77,8 @@ const cruiseData = [
     arrive: '8:00 AM',
     depart: '5:00 PM',
     highlight: 'Homeland of the Viking Kings',
+    lat: 59.413,
+    lng: 5.268,
     heroImage: 'https://images.unsplash.com/photo-1518118014377-ce997e5967ee?auto=format&fit=crop&q=80&w=1000',
     weather: '7°C / Clear (Est)',
     activities: 'Visit the Haraldshaugen national monument. Dive into true Viking history at Avaldsnes.',
@@ -79,6 +91,8 @@ const cruiseData = [
     arrive: '—',
     depart: '—',
     highlight: 'Final Ship Day',
+    lat: 55.0,
+    lng: 2.0,
     heroImage: 'https://images.unsplash.com/photo-1579562095311-2eb26197ba75?auto=format&fit=crop&q=80&w=1000',
     weather: '9°C / Cloudy (Est)',
     activities: 'Final specialty dining, packing, and enjoying the Grand Atrium entertainment.',
@@ -91,6 +105,8 @@ const cruiseData = [
     arrive: '6:30 AM',
     depart: '—',
     highlight: 'Heading Home',
+    lat: 50.897,
+    lng: -1.404,
     heroImage: 'https://images.unsplash.com/photo-1605307068538-aa2376fc9981?auto=format&fit=crop&q=80&w=1000',
     weather: '11°C / Rain (Est)',
     activities: 'Breakfast, grab luggage, and drive/train back home.',
@@ -285,3 +301,100 @@ document.addEventListener('DOMContentLoaded', () => {
   initApp();
   switchLogistics('greenfield');
 });
+
+
+// --- Map Logic ---
+let gmap;
+let shipMarker;
+let portMarkers = [];
+
+window.initMap = function() {
+  const ph = document.getElementById('map-placeholder');
+  if (ph) ph.style.display = 'none';
+  
+  const initialData = cruiseData[selectedDayIndex];
+  
+  gmap = new google.maps.Map(document.getElementById('map-container'), {
+    center: { lat: initialData.lat, lng: initialData.lng },
+    zoom: 5,
+    disableDefaultUI: false,
+    zoomControl: true,
+    mapTypeControl: false,
+    streetViewControl: false,
+    styles: [
+      { elementType: 'geometry', stylers: [{ color: '#112236' }] },
+      { elementType: 'labels.text.stroke', stylers: [{ color: '#1a365d' }] },
+      { elementType: 'labels.text.fill', stylers: [{ color: '#94a3b8' }] },
+      { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0b1320' }] },
+      { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#38bdf8' }] }
+    ]
+  });
+
+  const shipIcon = {
+    url: 'data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="%23fbbf24"><path d="M48 0C21.5 0 0 21.5 0 48V256H144c8.8 0 16 7.2 16 16s-7.2 16-16 16H0v64H144c8.8 0 16 7.2 16 16s-7.2 16-16 16H0v26.7C0 452.9 31 480 69.1 480H506.9c38.1 0 69.1-27.1 69.1-69.3V384H432c-8.8 0-16-7.2-16-16s7.2-16 16-16h144V288H432c-8.8 0-16-7.2-16-16s7.2-16 16-16h144V48c0-26.5-21.5-48-48-48H48z"/></svg>',
+    scaledSize: new google.maps.Size(32, 32),
+    anchor: new google.maps.Point(16, 16)
+  };
+
+  shipMarker = new google.maps.Marker({
+    position: { lat: initialData.lat, lng: initialData.lng },
+    map: gmap,
+    icon: shipIcon,
+    title: 'P&O Arvia',
+    zIndex: 100
+  });
+
+  // Add route line
+  const routePath = new google.maps.Polyline({
+    path: cruiseData.map(d => ({lat: d.lat, lng: d.lng})),
+    geodesic: true,
+    strokeColor: '#38bdf8',
+    strokeOpacity: 0.5,
+    strokeWeight: 2
+  });
+  routePath.setMap(gmap);
+
+  // Add port markers
+  cruiseData.forEach((d, idx) => {
+    if (d.port !== 'At Sea') {
+      const m = new google.maps.Marker({
+        position: { lat: d.lat, lng: d.lng },
+        map: gmap,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 4,
+          fillColor: '#2dd4bf',
+          fillOpacity: 1,
+          strokeColor: '#ffffff',
+          strokeWeight: 1
+        },
+        title: d.port
+      });
+      portMarkers.push(m);
+    }
+  });
+};
+
+// Hook into selectDay to move the ship
+const originalSelectDay = selectDay;
+window.selectDay = function(idx) {
+  originalSelectDay(idx);
+  const data = cruiseData[idx];
+  if (gmap && shipMarker) {
+    // Animate ship smoothly
+    const startPos = shipMarker.getPosition();
+    const endPos = new google.maps.LatLng(data.lat, data.lng);
+    let step = 0;
+    const numSteps = 50;
+    const interval = setInterval(() => {
+      step++;
+      const lat = startPos.lat() + (endPos.lat() - startPos.lat()) * (step / numSteps);
+      const lng = startPos.lng() + (endPos.lng() - startPos.lng()) * (step / numSteps);
+      shipMarker.setPosition({ lat, lng });
+      if (step >= numSteps) {
+        clearInterval(interval);
+        gmap.panTo(endPos);
+      }
+    }, 15);
+  }
+};

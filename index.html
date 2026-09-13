@@ -14,6 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBDcXjetWWNWFKdG_OrxxnOtgiTie_FeSs&callback=initMap&loading=async" async defer></script>
 </head>
 <body>
 
@@ -108,6 +109,20 @@
       
       <!-- Right Column: Detail View -->
       <main class="main-content">
+        
+        <!-- Ship Map Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="fa-solid fa-map-location-dot"></i> Live P&O Arvia Tracker</h2>
+          </div>
+          <div id="map-container" style="height: 300px; width: 100%; background: #000; position: relative;">
+            <div id="map-placeholder" style="position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
+              <i class="fa-solid fa-ship fa-spin" style="font-size: 32px; color: var(--primary);"></i>
+              <p style="margin-top: 10px; color: var(--text-muted);">Loading Fjords Map...</p>
+            </div>
+          </div>
+        </div>
+
         <div class="card" id="day-details-card">
           <!-- JS Populated -->
         </div>
