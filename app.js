@@ -4,13 +4,13 @@ const cruiseData = [
   {
     day: 0,
     date: 'Sun 28 Mar 2027',
-    port: 'Southampton (Embarkation)',
+    port: 'Embark: Southampton',
     arrive: '12:00 PM Check-in',
     depart: '5:00 PM Sailing',
     highlight: 'Boarding the P&O Arvia!',
     lat: 50.897,
     lng: -1.404,
-    heroImage: 'https://images.unsplash.com/photo-1599827552599-eadf5af3c6f2?auto=format&fit=crop&q=80&w=1000',
+    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Southampton_Docks.jpg',
     weather: '10°C / Cloudy (Est)',
     activities: 'Explore the ship, check out the Altitude Skywalk, and enjoy the Sailaway party as we leave Southampton.',
     kids: 'Register for Splash Valley and The Reef kids clubs! Find the mini-golf course.',
@@ -24,7 +24,7 @@ const cruiseData = [
     highlight: 'Cruising the North Sea',
     lat: 54.5,
     lng: 3.5,
-    heroImage: 'https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&q=80&w=1000',
+    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/e/ec/North_Sea_from_the_air.jpg',
     weather: '8°C / Windy (Est)',
     activities: 'Relax in the Oasis Spa, catch a show in the Headliners Theatre, or brave the outdoor pools if heated!',
     kids: 'Altitude Minigolf tournament and mastering the high ropes on the Skywalk.',
@@ -38,7 +38,7 @@ const cruiseData = [
     highlight: 'Lysefjord & Pulpit Rock Views',
     lat: 58.9699,
     lng: 5.7331,
-    heroImage: 'https://images.unsplash.com/photo-1513515438885-9372f6a9e1e3?auto=format&fit=crop&q=80&w=1000',
+    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/3/36/Stavanger_port.jpg',
     weather: '6°C / Showers (Est)',
     activities: 'Wander through Gamle Stavanger (Old Town) with its white wooden houses, or take a fjord cruise to see Preikestolen.',
     kids: 'Visit the Norwegian Petroleum Museum for interactive exhibits, or a thrilling RIB boat ride on the fjord!',
@@ -52,7 +52,7 @@ const cruiseData = [
     highlight: 'Briksdal Glacier',
     lat: 61.833,
     lng: 6.816,
-    heroImage: 'https://images.unsplash.com/photo-1626248967015-188b430d4cdb?auto=format&fit=crop&q=80&w=1000',
+    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/Briksdalsbreen_glacier.jpg',
     weather: '5°C / Crisp (Est)',
     activities: 'Hike or take the Troll car up to the magnificent Briksdal Glacier. Witness the deep blue ice and waterfalls.',
     kids: 'Riding the troll cars and spotting waterfalls. Excellent day for hot chocolate!',
@@ -66,7 +66,7 @@ const cruiseData = [
     highlight: 'Art Nouveau Architecture & Seven Sisters Waterfall',
     lat: 62.472,
     lng: 6.154,
-    heroImage: 'https://images.unsplash.com/photo-1601007421867-0c7f202298c9?auto=format&fit=crop&q=80&w=1000',
+    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Alesund_from_Aksla.jpg',
     weather: '6°C / Overcast (Est)',
     activities: 'Climb the 418 steps to the Mount Aksla viewpoint for a panoramic view of the islands and town.',
     kids: 'Atlanterhavsparken (Atlantic Sea-Park) aquarium to see penguins and massive fish!',
@@ -80,7 +80,7 @@ const cruiseData = [
     highlight: 'Homeland of the Viking Kings',
     lat: 59.413,
     lng: 5.268,
-    heroImage: 'https://images.unsplash.com/photo-1518118014377-ce997e5967ee?auto=format&fit=crop&q=80&w=1000',
+    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/7/77/Haugesund_Norway.jpg',
     weather: '7°C / Clear (Est)',
     activities: 'Visit the Haraldshaugen national monument. Dive into true Viking history at Avaldsnes.',
     kids: 'Viking Village at Avaldsnes – dress up and see how real Vikings lived!',
@@ -94,7 +94,7 @@ const cruiseData = [
     highlight: 'Final Ship Day',
     lat: 55.0,
     lng: 2.0,
-    heroImage: 'https://images.unsplash.com/photo-1579562095311-2eb26197ba75?auto=format&fit=crop&q=80&w=1000',
+    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/d/de/Ocean_waves.jpg',
     weather: '9°C / Cloudy (Est)',
     activities: 'Final specialty dining, packing, and enjoying the Grand Atrium entertainment.',
     kids: 'Farewell party at The Reef, last chance at the Escape Room.',
@@ -102,13 +102,13 @@ const cruiseData = [
   {
     day: 7,
     date: 'Sun 04 Apr 2027',
-    port: 'Southampton (Disembarkation)',
+    port: 'Disembark: Southampton',
     arrive: '6:30 AM',
     depart: '—',
     highlight: 'Heading Home',
     lat: 50.897,
     lng: -1.404,
-    heroImage: 'https://images.unsplash.com/photo-1605307068538-aa2376fc9981?auto=format&fit=crop&q=80&w=1000',
+    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Southampton_Docks.jpg',
     weather: '11°C / Rain (Est)',
     activities: 'Breakfast, grab luggage, and drive/train back home.',
     kids: 'Saying goodbye to the Arvia and swapping photos.',
@@ -406,9 +406,9 @@ window.initMap = function() {
 
   // Custom Viking Longboat / Ship SVG
   const vikingShipIcon = {
-    url: 'data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" fill="%23d4af37"><path d="M632 320c-17.7 0-32-14.3-32-32V112c0-8.8-7.2-16-16-16s-16 7.2-16 16v96c0 17.7-14.3 32-32 32s-32-14.3-32-32V32c0-17.7-14.3-32-32-32s-32 14.3-32 32v176c0 17.7-14.3 32-32 32s-32-14.3-32-32V112c0-17.7-14.3-32-32-32s-32 14.3-32 32v128c0 17.7-14.3 32-32 32s-32-14.3-32-32V80c0-17.7-14.3-32-32-32s-32 14.3-32 32v160c0 17.7-14.3 32-32 32s-32-14.3-32-32v-64c0-17.7-14.3-32-32-32s-32 14.3-32 32v112c0 17.7-14.3 32-32 32s-32-14.3-32-32V176c0-17.7-14.3-32-32-32S0 158.3 0 176v112c0 17.7 14.3 32 32 32h16.5c10.4 46.1 48 83.7 94.1 94.1H497.4c46.1-10.4 83.7-48 94.1-94.1H608c17.7 0 32-14.3 32-32zM128 352H512c26.5 0 48-21.5 48-48V256H80v48c0 26.5 21.5 48 48 48z"/></svg>',
-    scaledSize: new google.maps.Size(40, 40),
-    anchor: new google.maps.Point(20, 20)
+    url: 'data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M 45 15 L 45 60 L 80 60 L 75 15 Z" fill="%23f8fafc" stroke="%23d4af37" stroke-width="2"/><rect x="42" y="10" width="4" height="60" fill="%23d4af37"/><path d="M 10 50 C 10 30, 20 20, 20 20 C 20 20, 15 35, 20 55 C 30 75, 70 75, 80 55 C 85 35, 80 20, 80 20 C 80 20, 90 30, 90 50 C 90 80, 50 90, 10 50" fill="%23d4af37"/><circle cx="35" cy="62" r="4" fill="%23ef4444"/><circle cx="45" cy="64" r="4" fill="%232dd4bf"/><circle cx="55" cy="64" r="4" fill="%23ef4444"/><circle cx="65" cy="62" r="4" fill="%232dd4bf"/></svg>',
+    scaledSize: new google.maps.Size(48, 48),
+    anchor: new google.maps.Point(24, 24)
   };
 
   window.shipMarker = new google.maps.Marker({
@@ -422,23 +422,42 @@ window.initMap = function() {
   // Coastal / Fjord Route Waypoints (Avoiding straight lines over land)
   const realisticRoute = [
     {lat: 50.897, lng: -1.404}, // Southampton
+    {lat: 50.7, lng: -1.0},
     {lat: 50.6, lng: 0.1},      // English Channel
+    {lat: 51.0, lng: 1.2},
     {lat: 51.5, lng: 2.0},      // North Sea South
-    {lat: 54.5, lng: 3.5},      // North Sea Mid (At Sea day)
-    {lat: 57.5, lng: 4.5},      // North Sea North
+    {lat: 52.5, lng: 2.5},
+    {lat: 54.5, lng: 3.5},      // North Sea Mid
+    {lat: 56.5, lng: 4.0},
+    {lat: 58.2, lng: 5.2},      // Approaching Norway
+    {lat: 58.6, lng: 5.4},
     {lat: 58.9699, lng: 5.7331},// Stavanger
-    {lat: 59.3, lng: 4.8},      // Coastal turning point
-    {lat: 61.2, lng: 4.5},      // Coastal turning point 2
-    {lat: 61.85, lng: 5.1},     // Entering Nordfjord
+    {lat: 59.2, lng: 5.1},      // Coastal turning point
+    {lat: 59.7, lng: 5.0},
+    {lat: 60.5, lng: 4.8},
+    {lat: 61.1, lng: 4.6},
+    {lat: 61.5, lng: 4.8},
+    {lat: 61.9, lng: 5.1},      // Entering Nordfjord
+    {lat: 61.9, lng: 5.5},
+    {lat: 61.9, lng: 6.0},
+    {lat: 61.85, lng: 6.5},
     {lat: 61.833, lng: 6.816},  // Olden
-    {lat: 61.85, lng: 5.1},     // Exiting Nordfjord
-    {lat: 62.3, lng: 5.0},      // Coastal turning point 3
+    {lat: 61.85, lng: 6.5},     // Exiting Nordfjord
+    {lat: 61.9, lng: 5.1},
+    {lat: 62.1, lng: 4.9},      // Coast Northbound
+    {lat: 62.4, lng: 5.3},
     {lat: 62.472, lng: 6.154},  // Ålesund / Hellesylt
-    {lat: 62.3, lng: 5.0},      // Coastal turning point 3
+    {lat: 62.4, lng: 5.3},      // Coast Southbound
+    {lat: 62.1, lng: 4.9},
+    {lat: 61.0, lng: 4.5},
+    {lat: 59.7, lng: 5.0},
     {lat: 59.413, lng: 5.268},  // Haugesund
-    {lat: 55.0, lng: 2.0},      // At Sea Southbound
-    {lat: 51.5, lng: 2.0},      
-    {lat: 50.6, lng: 0.1},      
+    {lat: 58.0, lng: 4.5},      // At Sea Southbound
+    {lat: 56.0, lng: 3.5},
+    {lat: 53.0, lng: 2.5},
+    {lat: 51.5, lng: 1.8},
+    {lat: 51.0, lng: 1.0},
+    {lat: 50.7, lng: 0.0},
     {lat: 50.897, lng: -1.404}, // Southampton
   ];
 
