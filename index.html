@@ -3,46 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#415a77">
+  <meta name="theme-color" content="#1a202c">
   <title>Arvia Fjords 2027</title>
   
   <link rel="manifest" href="./manifest.json">
   <link rel="stylesheet" href="./styles.css">
   
+  <!-- Viking style font replacement: Cinzel for headers, Inter for text -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBDcXjetWWNWFKdG_OrxxnOtgiTie_FeSs&callback=initMap&loading=async" async defer></script>
 </head>
 <body>
 
-  <!-- Splash Screen / Gatekeeper -->
   <div id="splash-screen" class="splash-overlay hidden">
     <div class="splash-card">
-      <i class="fa-solid fa-ship" style="font-size: 40px; color: var(--primary); margin-bottom: 15px;"></i>
+      <i class="fa-brands fa-d-and-d" style="font-size: 50px; color: var(--viking-gold); margin-bottom: 15px;"></i>
       <h1 class="splash-title">Arvia Fjords 2027</h1>
-      <p class="splash-subtitle">Butt/Penkett & Currie/Rowlands Families</p>
+      <p class="splash-subtitle">Al-Tahoor/Sarah & Jonny/Emily</p>
       
       <div class="splash-input-group">
-        <input type="password" id="passcode-input" placeholder="Enter Family Passcode" onkeydown="if(event.key==='Enter') unlockPortal()">
+        <input type="password" id="passcode-input" placeholder="Enter Clan Passcode" onkeydown="if(event.key==='Enter') unlockPortal()">
         <button onclick="unlockPortal()">Unlock Itinerary</button>
       </div>
-      <div id="splash-error" class="splash-error hidden"><i class="fa-solid fa-triangle-exclamation"></i> Incorrect passcode. (Hint: where are you going?)</div>
+      <div id="splash-error" class="splash-error hidden"><i class="fa-solid fa-triangle-exclamation"></i> Incorrect passcode.</div>
       
-      <div class="viking-decor" style="font-size: 14px; letter-spacing: 5px; margin-top: 30px;">
+      <div class="viking-decor" style="font-size: 16px; letter-spacing: 8px; margin-top: 30px;">
         ᚠᛃᛟᚱᛞᛊ
       </div>
     </div>
   </div>
 
-  <!-- Main App Portal -->
   <div id="portal-content" class="hidden">
     
     <header class="app-header">
       <div class="brand">
-        <i class="fa-brands fa-nfc-symbol brand-icon"></i>
+        <i class="fa-brands fa-d-and-d brand-icon"></i>
         <div>
           <h1>P&O Arvia</h1>
           <span class="subtitle">Norwegian Fjords &bull; Mar/Apr 2027</span>
@@ -66,16 +65,14 @@
     
     <div class="content-wrapper main-container">
       
-      <!-- Left Column: Navigation & Sidebar info -->
+      <!-- Left Column -->
       <aside class="sidebar">
         <div class="card">
           <div class="card-header">
-            <h2><i class="fa-regular fa-compass"></i> Itinerary</h2>
+            <h2><i class="fa-regular fa-compass"></i> The Saga (Itinerary)</h2>
           </div>
           <div class="card-body" style="padding: 10px;">
-            <div id="day-list" class="day-list">
-              <!-- JS Populated -->
-            </div>
+            <div id="day-list" class="day-list"></div>
           </div>
         </div>
         
@@ -85,40 +82,51 @@
           </div>
           <div class="card-body" style="padding: 0;">
             <div class="logistics-tabs">
-              <button id="tab-greenfield" class="logistics-tab active" onclick="switchLogistics('greenfield')">Greenfield</button>
-              <button id="tab-cardiff" class="logistics-tab" onclick="switchLogistics('cardiff')">Cardiff</button>
+              <button id="tab-greenfield" class="logistics-tab active" onclick="switchLogistics('greenfield')">Al-Tahoor</button>
+              <button id="tab-cardiff" class="logistics-tab" onclick="switchLogistics('cardiff')">Jonny</button>
             </div>
-            <div id="logistics-content" class="logistics-content" style="padding: 15px;">
-              <!-- JS Populated -->
+            <div id="logistics-content" class="logistics-content" style="padding: 15px;"></div>
+          </div>
+        </div>
+
+        <div class="card" style="border-color: var(--warning);">
+          <div class="card-header" style="background: rgba(251, 191, 36, 0.1);">
+            <h2 style="color: var(--warning);"><i class="fa-solid fa-triangle-exclamation"></i> Jonny's Underpants Tracker</h2>
+          </div>
+          <div class="card-body" style="text-align: center;">
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">A friendly reminder to pack enough for the journey.</p>
+            <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px; font-family: var(--font-heading);">
+              <span id="pants-used">0</span> / <span id="pants-total">14</span> Used
             </div>
+            <div style="background: #112236; height: 12px; border-radius: 6px; overflow: hidden; margin-bottom: 15px;">
+              <div id="pants-bar" style="background: var(--accent); height: 100%; width: 0%; transition: 0.3s;"></div>
+            </div>
+            <button onclick="incrementPants()" class="btn btn-primary" style="padding: 8px 16px;"><i class="fa-solid fa-plus"></i> Used One</button>
+            <button onclick="resetPants()" class="btn btn-outline" style="padding: 8px 16px; margin-left: 5px;"><i class="fa-solid fa-rotate-right"></i> Reset</button>
           </div>
         </div>
         
         <div class="card">
           <div class="card-header">
-            <h2><i class="fa-solid fa-suitcase"></i> Fjords Packing Checklist</h2>
-            <small id="packing-progress" style="color: var(--primary);">0 of 8 Ready</small>
+            <h2><i class="fa-solid fa-suitcase"></i> Fjords Packing</h2>
           </div>
           <div class="card-body">
-            <div id="packing-items" class="packing-list">
-              <!-- JS Populated -->
-            </div>
+            <div id="packing-items" class="packing-list"></div>
           </div>
         </div>
       </aside>
       
-      <!-- Right Column: Detail View -->
+      <!-- Right Column -->
       <main class="main-content">
         
-        <!-- Ship Map Card -->
-        <div class="card">
-          <div class="card-header">
-            <h2><i class="fa-solid fa-map-location-dot"></i> Live P&O Arvia Tracker</h2>
+        <div class="card" style="border: 2px solid var(--viking-gold);">
+          <div class="card-header" style="background: rgba(212, 175, 55, 0.1);">
+            <h2 style="color: var(--viking-gold);"><i class="fa-solid fa-map-location-dot"></i> Live Viking Ship Tracker</h2>
           </div>
-          <div id="map-container" style="height: 300px; width: 100%; background: #000; position: relative;">
+          <div id="map-container" style="height: 350px; width: 100%; background: #000; position: relative;">
             <div id="map-placeholder" style="position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
               <i class="fa-solid fa-ship fa-spin" style="font-size: 32px; color: var(--primary);"></i>
-              <p style="margin-top: 10px; color: var(--text-muted);">Loading Fjords Map...</p>
+              <p style="margin-top: 10px; color: var(--text-muted);">Charting the course...</p>
             </div>
           </div>
         </div>
@@ -126,10 +134,44 @@
         <div class="card" id="day-details-card">
           <!-- JS Populated -->
         </div>
+
+        <!-- NEW: Deck Plan Explorer -->
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="fa-solid fa-layer-group"></i> Arvia Deck Plan Explorer</h2>
+          </div>
+          <div class="card-body">
+            <input type="text" id="deck-search" placeholder="Search for a venue or cabin (e.g. Sindhu)..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--card-border); background: #0b1320; color: white; margin-bottom: 15px;">
+            <div id="deck-plan-container" style="display: flex; flex-direction: column; gap: 10px;">
+              <!-- JS Populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW: Useful Links / Suggestions -->
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="fa-solid fa-wand-magic-sparkles"></i> Useful Links & Tools</h2>
+          </div>
+          <div class="card-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <a href="https://www.xe.com/currencyconverter/convert/?Amount=1&From=GBP&To=NOK" target="_blank" style="text-decoration: none;">
+              <div class="detail-box" style="text-align: center;">
+                <h3 style="color: white;"><i class="fa-solid fa-money-bill"></i> Currency Converter</h3>
+                <p style="font-size: 12px; color: var(--text-muted);">GBP to NOK</p>
+              </div>
+            </a>
+            <a href="https://www.norway-lights.com/" target="_blank" style="text-decoration: none;">
+              <div class="detail-box" style="text-align: center; border-color: #2dd4bf;">
+                <h3 style="color: #2dd4bf;"><i class="fa-solid fa-star"></i> Aurora Forecast</h3>
+                <p style="font-size: 12px; color: var(--text-muted);">Check Northern Lights</p>
+              </div>
+            </a>
+          </div>
+        </div>
+
       </main>
       
     </div>
-    
   </div>
 
   <script src="./app.js"></script>

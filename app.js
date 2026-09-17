@@ -1,3 +1,4 @@
+
 // P&O Arvia Norwegian Fjords 2027 Data Model
 const cruiseData = [
   {
@@ -21,8 +22,8 @@ const cruiseData = [
     arrive: '—',
     depart: '—',
     highlight: 'Cruising the North Sea',
-    lat: 54.0,
-    lng: 3.0,
+    lat: 54.5,
+    lng: 3.5,
     heroImage: 'https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&q=80&w=1000',
     weather: '8°C / Windy (Est)',
     activities: 'Relax in the Oasis Spa, catch a show in the Headliners Theatre, or brave the outdoor pools if heated!',
@@ -59,7 +60,7 @@ const cruiseData = [
   {
     day: 4,
     date: 'Thu 01 Apr 2027',
-    port: 'Ålesund / Hellesylt (Geirangerfjord)',
+    port: 'Ålesund / Hellesylt',
     arrive: '8:00 AM',
     depart: '5:00 PM',
     highlight: 'Art Nouveau Architecture & Seven Sisters Waterfall',
@@ -126,12 +127,50 @@ const packingItems = [
   { id: 8, text: 'UK Plugs / Chargers (Arvia has UK sockets)', done: false }
 ];
 
+// Deck Plan Data (Sorted Numerically)
+const deckPlans = [
+  {
+    deck: 'Deck 19',
+    venues: ['Altitude Skywalk', 'Altitude Minigolf', 'Splash Valley']
+  },
+  {
+    deck: 'Deck 18',
+    venues: ['Skybar', 'Infinity Pool']
+  },
+  {
+    deck: 'Deck 17',
+    venues: ['The Epicurean', 'Sindhu', 'Oasis Spa']
+  },
+  {
+    deck: 'Deck 16',
+    venues: ['Skydome', 'The Quays', 'Horizon Restaurant']
+  },
+  {
+    deck: 'Deck 11',
+    venues: ['Al-Tahoor & Sarah Cabin (Placeholder: 11234)', 'Jonny & Emily Cabin (Placeholder: 11236)']
+  },
+  {
+    deck: 'Deck 8',
+    venues: ['Grand Atrium (Top)', 'The Keel & Cow', 'The Olive Grove', 'Ocean Studios']
+  },
+  {
+    deck: 'Deck 7',
+    venues: ['Grand Atrium (Mid)', 'Glass House', '710 Club', 'Headliners Theatre (Balcony)']
+  },
+  {
+    deck: 'Deck 6',
+    venues: ['Grand Atrium (Base)', '6th Street Diner', 'Anderson\'s Bar', 'Headliners Theatre (Stalls)']
+  }
+];
+
 // App State
 let selectedDayIndex = 0;
 let activeLogisticsTab = 'greenfield';
+let jonnyPantsUsed = parseInt(localStorage.getItem('jonny_pants') || '0');
+const JONNY_PANTS_TOTAL = 14;
 
 // Authentication
-const VALID_PASSCODES = ['viking', 'fjords2027', 'arvia']; // Simplified for this implementation
+const VALID_PASSCODES = ['viking', 'fjords2027', 'arvia'];
 let isAuthenticated = localStorage.getItem('arvia_auth') === 'true';
 
 function initApp() {
@@ -145,6 +184,8 @@ function initApp() {
     selectDay(0);
     renderPackingList();
     startCountdown();
+    updatePantsTracker();
+    renderDeckPlan('');
   }
 }
 
@@ -181,7 +222,7 @@ function renderDayList() {
 
 function selectDay(idx) {
   selectedDayIndex = idx;
-  renderDayList(); // Update active state on buttons
+  renderDayList();
   
   const day = cruiseData[idx];
   const detailHtml = `
@@ -195,30 +236,37 @@ function selectDay(idx) {
     
     <div class="card-body">
       <div class="weather-widget">
-        <i class="fa-solid fa-cloud-sun weather-icon"></i>
+        <i class="fa-solid fa-wind weather-icon"></i>
         <div class="weather-info">
-          <h3>Weather Estimate</h3>
+          <h3>Northern Conditions</h3>
           <p>${day.weather}</p>
         </div>
       </div>
       
       <p style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: var(--viking-gold);">
-        <i class="fa-solid fa-star"></i> Highlight: ${day.highlight}
+        <i class="fa-brands fa-d-and-d"></i> Highlight: ${day.highlight}
       </p>
       
       <div class="detail-grid">
         <div class="detail-box">
-          <h3><i class="fa-solid fa-ship"></i> Family Activities</h3>
+          <h3><i class="fa-solid fa-shield-halved"></i> Clan Activities</h3>
           <p>${day.activities}</p>
         </div>
         <div class="detail-box" style="border-color: var(--accent);">
-          <h3 style="color: var(--accent);"><i class="fa-solid fa-gamepad"></i> Kids Squad Plan</h3>
+          <h3 style="color: var(--accent);"><i class="fa-solid fa-khanda"></i> Youth Viking Squad</h3>
           <p>${day.kids}</p>
         </div>
       </div>
     </div>
   `;
   document.getElementById('day-details-card').innerHTML = detailHtml;
+
+  // Move the ship
+  if (window.gmap && window.shipMarker) {
+    const endPos = new google.maps.LatLng(day.lat, day.lng);
+    gmap.panTo(endPos);
+    window.shipMarker.setPosition(endPos);
+  }
 }
 
 function switchLogistics(tab) {
@@ -229,12 +277,11 @@ function switchLogistics(tab) {
   const content = document.getElementById('logistics-content');
   if (tab === 'greenfield') {
     content.innerHTML = `
-      <h3 style="color: var(--primary); margin-bottom: 5px;">Greenfield to Southampton (Altahoor, Sarah, Jacob, Ellie)</h3>
+      <h3 style="color: var(--primary); margin-bottom: 5px;">Greenfield to Southampton (Al-Tahoor, Sarah, Jacob, Ellie)</h3>
       <p>Distance: ~220 miles (approx 4 hours driving)</p>
       <ul>
         <li><strong>Drive:</strong> Leave early morning. Take M62, M60, M56, M6, M40, A34. Book port parking (CPS Parking) in advance.</li>
         <li><strong>Train:</strong> Greenfield -> Manchester Piccadilly -> CrossCountry to Reading -> Train to Southampton Central. (~5 hours). Taxi to Ocean Terminal.</li>
-        <li><strong>Luggage:</strong> Pre-print tags, drop with porters at Ocean Terminal before parking.</li>
       </ul>
     `;
   } else {
@@ -244,7 +291,6 @@ function switchLogistics(tab) {
       <ul>
         <li><strong>Drive:</strong> Take M4 East to A34 South. Easiest route, book CPS port parking in advance.</li>
         <li><strong>Train:</strong> Direct GWR train from Cardiff Central to Southampton Central (~2.5 hours). Short taxi to terminal.</li>
-        <li><strong>Meeting Point:</strong> Meet the Butt/Penkett family in the terminal or onboard at the Grand Atrium!</li>
       </ul>
     `;
   }
@@ -258,9 +304,6 @@ function renderPackingList() {
       ${item.text}
     </div>
   `).join('');
-  
-  const doneCount = packingItems.filter(i => i.done).length;
-  document.getElementById('packing-progress').innerText = `${doneCount} of ${packingItems.length} Ready`;
 }
 
 function togglePacking(id) {
@@ -272,129 +315,163 @@ function togglePacking(id) {
 }
 
 function startCountdown() {
-  // Target: March 28, 2027 12:00 PM
   const embarkDate = new Date('March 28, 2027 12:00:00').getTime();
-  
   setInterval(() => {
     const now = new Date().getTime();
     const diff = embarkDate - now;
-    
-    if (diff < 0) {
-      document.getElementById('countdown-timer').innerHTML = '<div style="font-weight:bold; color:var(--success);">Cruising Now!</div>';
-      return;
-    }
-    
-    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const s = Math.floor((diff % (1000 * 60)) / 1000);
-    
-    document.getElementById('days').innerText = String(d).padStart(2, '0');
-    document.getElementById('hours').innerText = String(h).padStart(2, '0');
-    document.getElementById('mins').innerText = String(m).padStart(2, '0');
-    document.getElementById('secs').innerText = String(s).padStart(2, '0');
+    if (diff < 0) return;
+    document.getElementById('days').innerText = String(Math.floor(diff / (1000 * 60 * 60 * 24))).padStart(2, '0');
+    document.getElementById('hours').innerText = String(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+    document.getElementById('mins').innerText = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+    document.getElementById('secs').innerText = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
   }, 1000);
 }
 
-// Initialize on load
-document.addEventListener('DOMContentLoaded', () => {
-  initApp();
-  switchLogistics('greenfield');
+function incrementPants() {
+  if (jonnyPantsUsed < JONNY_PANTS_TOTAL) {
+    jonnyPantsUsed++;
+    localStorage.setItem('jonny_pants', jonnyPantsUsed);
+    updatePantsTracker();
+  }
+}
+function resetPants() {
+  jonnyPantsUsed = 0;
+  localStorage.setItem('jonny_pants', jonnyPantsUsed);
+  updatePantsTracker();
+}
+function updatePantsTracker() {
+  document.getElementById('pants-used').innerText = jonnyPantsUsed;
+  document.getElementById('pants-total').innerText = JONNY_PANTS_TOTAL;
+  const progress = (jonnyPantsUsed / JONNY_PANTS_TOTAL) * 100;
+  document.getElementById('pants-bar').style.width = `${progress}%`;
+  if (jonnyPantsUsed >= JONNY_PANTS_TOTAL) {
+    document.getElementById('pants-bar').style.backgroundColor = 'var(--danger)';
+  } else {
+    document.getElementById('pants-bar').style.backgroundColor = 'var(--accent)';
+  }
+}
+
+function renderDeckPlan(filterText = '') {
+  const container = document.getElementById('deck-plan-container');
+  const lowerFilter = filterText.toLowerCase();
+  
+  let html = '';
+  deckPlans.forEach(deck => {
+    const filteredVenues = deck.venues.filter(v => v.toLowerCase().includes(lowerFilter));
+    if (filteredVenues.length > 0 || deck.deck.toLowerCase().includes(lowerFilter)) {
+      html += `
+        <div class="deck-row">
+          <div class="deck-number">${deck.deck}</div>
+          <div class="deck-venues">
+            ${deck.venues.map(v => {
+              const matches = v.toLowerCase().includes(lowerFilter);
+              if (filterText && !matches) return '';
+              const isCabin = v.includes('Cabin');
+              return `<span class="deck-venue ${isCabin ? 'venue-cabin' : ''}">${v}</span>`;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+  });
+  
+  if (html === '') html = '<p style="color:var(--text-muted); padding: 10px;">No venues found matching your search.</p>';
+  container.innerHTML = html;
+}
+
+document.getElementById('deck-search')?.addEventListener('input', (e) => {
+  renderDeckPlan(e.target.value);
 });
 
-
 // --- Map Logic ---
-let gmap;
-let shipMarker;
-let portMarkers = [];
-
 window.initMap = function() {
   const ph = document.getElementById('map-placeholder');
   if (ph) ph.style.display = 'none';
   
   const initialData = cruiseData[selectedDayIndex];
   
-  gmap = new google.maps.Map(document.getElementById('map-container'), {
-    center: { lat: initialData.lat, lng: initialData.lng },
-    zoom: 5,
+  // Custom Map Styling
+  window.gmap = new google.maps.Map(document.getElementById('map-container'), {
+    center: { lat: 58.0, lng: 2.0 }, // Centered between UK and Norway
+    zoom: 4.8, // Zoomed out to show the journey
     disableDefaultUI: false,
-    zoomControl: true,
-    mapTypeControl: false,
-    streetViewControl: false,
     styles: [
       { elementType: 'geometry', stylers: [{ color: '#112236' }] },
       { elementType: 'labels.text.stroke', stylers: [{ color: '#1a365d' }] },
       { elementType: 'labels.text.fill', stylers: [{ color: '#94a3b8' }] },
       { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0b1320' }] },
-      { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#38bdf8' }] }
+      { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#2a4b7c' }] }
     ]
   });
 
-  const shipIcon = {
-    url: 'data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="%23fbbf24"><path d="M48 0C21.5 0 0 21.5 0 48V256H144c8.8 0 16 7.2 16 16s-7.2 16-16 16H0v64H144c8.8 0 16 7.2 16 16s-7.2 16-16 16H0v26.7C0 452.9 31 480 69.1 480H506.9c38.1 0 69.1-27.1 69.1-69.3V384H432c-8.8 0-16-7.2-16-16s7.2-16 16-16h144V288H432c-8.8 0-16-7.2-16-16s7.2-16 16-16h144V48c0-26.5-21.5-48-48-48H48z"/></svg>',
-    scaledSize: new google.maps.Size(32, 32),
-    anchor: new google.maps.Point(16, 16)
+  // Custom Viking Longboat / Ship SVG
+  const vikingShipIcon = {
+    url: 'data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" fill="%23d4af37"><path d="M632 320c-17.7 0-32-14.3-32-32V112c0-8.8-7.2-16-16-16s-16 7.2-16 16v96c0 17.7-14.3 32-32 32s-32-14.3-32-32V32c0-17.7-14.3-32-32-32s-32 14.3-32 32v176c0 17.7-14.3 32-32 32s-32-14.3-32-32V112c0-17.7-14.3-32-32-32s-32 14.3-32 32v128c0 17.7-14.3 32-32 32s-32-14.3-32-32V80c0-17.7-14.3-32-32-32s-32 14.3-32 32v160c0 17.7-14.3 32-32 32s-32-14.3-32-32v-64c0-17.7-14.3-32-32-32s-32 14.3-32 32v112c0 17.7-14.3 32-32 32s-32-14.3-32-32V176c0-17.7-14.3-32-32-32S0 158.3 0 176v112c0 17.7 14.3 32 32 32h16.5c10.4 46.1 48 83.7 94.1 94.1H497.4c46.1-10.4 83.7-48 94.1-94.1H608c17.7 0 32-14.3 32-32zM128 352H512c26.5 0 48-21.5 48-48V256H80v48c0 26.5 21.5 48 48 48z"/></svg>',
+    scaledSize: new google.maps.Size(40, 40),
+    anchor: new google.maps.Point(20, 20)
   };
 
-  shipMarker = new google.maps.Marker({
+  window.shipMarker = new google.maps.Marker({
     position: { lat: initialData.lat, lng: initialData.lng },
-    map: gmap,
-    icon: shipIcon,
+    map: window.gmap,
+    icon: vikingShipIcon,
     title: 'P&O Arvia',
     zIndex: 100
   });
 
-  // Add route line
-  const routePath = new google.maps.Polyline({
-    path: cruiseData.map(d => ({lat: d.lat, lng: d.lng})),
-    geodesic: true,
-    strokeColor: '#38bdf8',
-    strokeOpacity: 0.5,
-    strokeWeight: 2
-  });
-  routePath.setMap(gmap);
+  // Coastal / Fjord Route Waypoints (Avoiding straight lines over land)
+  const realisticRoute = [
+    {lat: 50.897, lng: -1.404}, // Southampton
+    {lat: 50.6, lng: 0.1},      // English Channel
+    {lat: 51.5, lng: 2.0},      // North Sea South
+    {lat: 54.5, lng: 3.5},      // North Sea Mid (At Sea day)
+    {lat: 57.5, lng: 4.5},      // North Sea North
+    {lat: 58.9699, lng: 5.7331},// Stavanger
+    {lat: 59.3, lng: 4.8},      // Coastal turning point
+    {lat: 61.2, lng: 4.5},      // Coastal turning point 2
+    {lat: 61.85, lng: 5.1},     // Entering Nordfjord
+    {lat: 61.833, lng: 6.816},  // Olden
+    {lat: 61.85, lng: 5.1},     // Exiting Nordfjord
+    {lat: 62.3, lng: 5.0},      // Coastal turning point 3
+    {lat: 62.472, lng: 6.154},  // Ålesund / Hellesylt
+    {lat: 62.3, lng: 5.0},      // Coastal turning point 3
+    {lat: 59.413, lng: 5.268},  // Haugesund
+    {lat: 55.0, lng: 2.0},      // At Sea Southbound
+    {lat: 51.5, lng: 2.0},      
+    {lat: 50.6, lng: 0.1},      
+    {lat: 50.897, lng: -1.404}, // Southampton
+  ];
 
-  // Add port markers
-  cruiseData.forEach((d, idx) => {
+  const routePath = new google.maps.Polyline({
+    path: realisticRoute,
+    geodesic: true,
+    strokeColor: '#d4af37', // Viking Gold
+    strokeOpacity: 0.6,
+    strokeWeight: 2,
+    strokeDasharray: '4 4'
+  });
+  routePath.setMap(window.gmap);
+
+  cruiseData.forEach((d) => {
     if (d.port !== 'At Sea') {
-      const m = new google.maps.Marker({
+      new google.maps.Marker({
         position: { lat: d.lat, lng: d.lng },
-        map: gmap,
+        map: window.gmap,
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
-          scale: 4,
-          fillColor: '#2dd4bf',
+          scale: 5,
+          fillColor: '#38bdf8',
           fillOpacity: 1,
-          strokeColor: '#ffffff',
-          strokeWeight: 1
+          strokeColor: '#0b1320',
+          strokeWeight: 2
         },
         title: d.port
       });
-      portMarkers.push(m);
     }
   });
 };
 
-// Hook into selectDay to move the ship
-const originalSelectDay = selectDay;
-window.selectDay = function(idx) {
-  originalSelectDay(idx);
-  const data = cruiseData[idx];
-  if (gmap && shipMarker) {
-    // Animate ship smoothly
-    const startPos = shipMarker.getPosition();
-    const endPos = new google.maps.LatLng(data.lat, data.lng);
-    let step = 0;
-    const numSteps = 50;
-    const interval = setInterval(() => {
-      step++;
-      const lat = startPos.lat() + (endPos.lat() - startPos.lat()) * (step / numSteps);
-      const lng = startPos.lng() + (endPos.lng() - startPos.lng()) * (step / numSteps);
-      shipMarker.setPosition({ lat, lng });
-      if (step >= numSteps) {
-        clearInterval(interval);
-        gmap.panTo(endPos);
-      }
-    }, 15);
-  }
-};
+document.addEventListener('DOMContentLoaded', () => {
+  initApp();
+  switchLogistics('greenfield');
+});
