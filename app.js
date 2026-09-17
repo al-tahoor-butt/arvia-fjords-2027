@@ -415,9 +415,9 @@ window.initMap = function() {
 
   // Custom Viking Longboat / Ship SVG
   const vikingShipIcon = {
-    url: 'data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M 45 15 L 45 60 L 80 60 L 75 15 Z" fill="%23f8fafc" stroke="%23d4af37" stroke-width="2"/><rect x="42" y="10" width="4" height="60" fill="%23d4af37"/><path d="M 15 20 Q 15 50 30 65 L 70 65 Q 85 50 85 20 Q 95 50 75 75 L 25 75 Q 5 50 15 20 Z" fill="%23d4af37"/><circle cx="35" cy="68" r="4" fill="%23ef4444"/><circle cx="45" cy="68" r="4" fill="%232dd4bf"/><circle cx="55" cy="68" r="4" fill="%23ef4444"/><circle cx="65" cy="68" r="4" fill="%232dd4bf"/></svg>',
-    scaledSize: new google.maps.Size(48, 48),
-    anchor: new google.maps.Point(24, 24)
+    url: 'data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g><animateTransform attributeName="transform" type="translate" values="0,0; 0,-4; 0,0" dur="2.5s" repeatCount="indefinite" /><animateTransform attributeName="transform" type="rotate" values="-3 50 50; 3 50 50; -3 50 50" dur="2.5s" repeatCount="indefinite" additive="sum"/><path d="M 45 15 L 45 60 L 80 60 L 75 15 Z" fill="%23f8fafc" stroke="%23d4af37" stroke-width="2"/><rect x="42" y="10" width="4" height="60" fill="%23d4af37"/><path d="M 15 20 Q 15 50 30 65 L 70 65 Q 85 50 85 20 Q 95 50 75 75 L 25 75 Q 5 50 15 20 Z" fill="%23d4af37"/><circle cx="35" cy="68" r="4" fill="%23ef4444"/><circle cx="45" cy="68" r="4" fill="%232dd4bf"/><circle cx="55" cy="68" r="4" fill="%23ef4444"/><circle cx="65" cy="68" r="4" fill="%232dd4bf"/></g></svg>',
+    scaledSize: new google.maps.Size(55, 55),
+    anchor: new google.maps.Point(27, 27)
   };
 
   window.shipMarker = new google.maps.Marker({
@@ -429,7 +429,7 @@ window.initMap = function() {
   });
 
   // Coastal / Fjord Route Waypoints (Avoiding straight lines over land)
-  const realisticRoute = [
+  window.realisticRoute = [
     {lat: 50.897, lng: -1.404}, // Southampton
     {lat: 50.7, lng: -1.0},
     {lat: 50.6, lng: 0.1},      // English Channel
