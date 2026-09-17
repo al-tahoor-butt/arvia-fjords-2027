@@ -146,8 +146,8 @@ const deckPlans = [
     venues: ['Skydome', 'The Quays', 'Horizon Restaurant']
   },
   {
-    deck: 'Deck 11',
-    venues: ['Al-Tahoor & Sarah Cabin (Placeholder: 11234)', 'Jonny & Emily Cabin (Placeholder: 11236)']
+    deck: 'Deck 15',
+    venues: ['Al-Tahoor & Sarah (Cabin 15631)', 'Jonny & Emily (Cabin 15621)']
   },
   {
     deck: 'Deck 8',
