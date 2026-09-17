@@ -10,7 +10,7 @@ const cruiseData = [
     highlight: 'Boarding the P&O Arvia!',
     lat: 50.897,
     lng: -1.404,
-    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Southampton_Docks.jpg',
+    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/9/96/View_across_Ocean_Village_Marina_%28geograph_5432669%29.jpg',
     weather: '10°C / Cloudy (Est)',
     activities: 'Explore the ship, check out the Altitude Skywalk, and enjoy the Sailaway party as we leave Southampton.',
     kids: 'Register for Splash Valley and The Reef kids clubs! Find the mini-golf course.',
@@ -24,7 +24,7 @@ const cruiseData = [
     highlight: 'Cruising the North Sea',
     lat: 54.5,
     lng: 3.5,
-    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/e/ec/North_Sea_from_the_air.jpg',
+    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/a/ae/NASA_NorthSea1_2.jpg',
     weather: '8°C / Windy (Est)',
     activities: 'Relax in the Oasis Spa, catch a show in the Headliners Theatre, or brave the outdoor pools if heated!',
     kids: 'Altitude Minigolf tournament and mastering the high ropes on the Skywalk.',
@@ -38,7 +38,7 @@ const cruiseData = [
     highlight: 'Lysefjord & Pulpit Rock Views',
     lat: 58.9699,
     lng: 5.7331,
-    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/3/36/Stavanger_port.jpg',
+    heroImage: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/Breiavatnet_-_Stavanger%2C_Norway_2021-08-01_%2802%29.jpg/1024px-Breiavatnet_-_Stavanger%2C_Norway_2021-08-01_%2802%29.jpg',
     weather: '6°C / Showers (Est)',
     activities: 'Wander through Gamle Stavanger (Old Town) with its white wooden houses, or take a fjord cruise to see Preikestolen.',
     kids: 'Visit the Norwegian Petroleum Museum for interactive exhibits, or a thrilling RIB boat ride on the fjord!',
@@ -52,7 +52,7 @@ const cruiseData = [
     highlight: 'Briksdal Glacier',
     lat: 61.833,
     lng: 6.816,
-    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/Briksdalsbreen_glacier.jpg',
+    heroImage: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/Olden_Norway.jpg/1024px-Olden_Norway.jpg',
     weather: '5°C / Crisp (Est)',
     activities: 'Hike or take the Troll car up to the magnificent Briksdal Glacier. Witness the deep blue ice and waterfalls.',
     kids: 'Riding the troll cars and spotting waterfalls. Excellent day for hot chocolate!',
@@ -66,7 +66,7 @@ const cruiseData = [
     highlight: 'Art Nouveau Architecture & Seven Sisters Waterfall',
     lat: 62.472,
     lng: 6.154,
-    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Alesund_from_Aksla.jpg',
+    heroImage: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Geirangerfjord_.jpg/1024px-Geirangerfjord_.jpg',
     weather: '6°C / Overcast (Est)',
     activities: 'Climb the 418 steps to the Mount Aksla viewpoint for a panoramic view of the islands and town.',
     kids: 'Atlanterhavsparken (Atlantic Sea-Park) aquarium to see penguins and massive fish!',
@@ -80,7 +80,7 @@ const cruiseData = [
     highlight: 'Homeland of the Viking Kings',
     lat: 59.413,
     lng: 5.268,
-    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/7/77/Haugesund_Norway.jpg',
+    heroImage: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e3/Smedasundet_-_Haugesund%2C_Norway_2021-08-05_%2802%29.jpg/1024px-Smedasundet_-_Haugesund%2C_Norway_2021-08-05_%2802%29.jpg',
     weather: '7°C / Clear (Est)',
     activities: 'Visit the Haraldshaugen national monument. Dive into true Viking history at Avaldsnes.',
     kids: 'Viking Village at Avaldsnes – dress up and see how real Vikings lived!',
@@ -94,7 +94,7 @@ const cruiseData = [
     highlight: 'Final Ship Day',
     lat: 55.0,
     lng: 2.0,
-    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/d/de/Ocean_waves.jpg',
+    heroImage: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Icon_of_the_Seas_Puerto_Rico_2025_%28cropped%29.jpg/1024px-Icon_of_the_Seas_Puerto_Rico_2025_%28cropped%29.jpg',
     weather: '9°C / Cloudy (Est)',
     activities: 'Final specialty dining, packing, and enjoying the Grand Atrium entertainment.',
     kids: 'Farewell party at The Reef, last chance at the Escape Room.',
@@ -108,7 +108,7 @@ const cruiseData = [
     highlight: 'Heading Home',
     lat: 50.897,
     lng: -1.404,
-    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Southampton_Docks.jpg',
+    heroImage: 'https://upload.wikimedia.org/wikipedia/commons/9/96/View_across_Ocean_Village_Marina_%28geograph_5432669%29.jpg',
     weather: '11°C / Rain (Est)',
     activities: 'Breakfast, grab luggage, and drive/train back home.',
     kids: 'Saying goodbye to the Arvia and swapping photos.',
@@ -239,7 +239,7 @@ function selectDay(idx) {
         <i class="fa-solid fa-wind weather-icon"></i>
         <div class="weather-info">
           <h3>Northern Conditions</h3>
-          <p>${day.weather}</p>
+          <p id="live-weather-text">${day.weather}</p>
         </div>
       </div>
       
@@ -261,12 +261,21 @@ function selectDay(idx) {
   `;
   document.getElementById('day-details-card').innerHTML = detailHtml;
 
-  // Move the ship
+// Move the ship
   if (window.gmap && window.shipMarker) {
     const endPos = new google.maps.LatLng(day.lat, day.lng);
     gmap.panTo(endPos);
     window.shipMarker.setPosition(endPos);
   }
+
+  // Attempt to fetch live weather
+  fetch(`https://api.open-meteo.com/v1/forecast?latitude=${day.lat}&longitude=${day.lng}&current_weather=true`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.current_weather) {
+        document.getElementById('live-weather-text').innerText = `${data.current_weather.temperature}°C / Wind: ${data.current_weather.windspeed} km/h (LIVE)`;
+      }
+    }).catch(err => console.log('Weather fetch failed, keeping estimate.'));
 }
 
 function switchLogistics(tab) {
@@ -277,7 +286,7 @@ function switchLogistics(tab) {
   const content = document.getElementById('logistics-content');
   if (tab === 'greenfield') {
     content.innerHTML = `
-      <h3 style="color: var(--primary); margin-bottom: 5px;">Greenfield to Southampton (Al-Tahoor, Sarah, Jacob, Ellie)</h3>
+      <h3 style="color: var(--primary); margin-bottom: 5px;">Greenfield to Southampton (Manchester, Greenfield)</h3>
       <p>Distance: ~220 miles (approx 4 hours driving)</p>
       <ul>
         <li><strong>Drive:</strong> Leave early morning. Take M62, M60, M56, M6, M40, A34. Book port parking (CPS Parking) in advance.</li>
@@ -286,7 +295,7 @@ function switchLogistics(tab) {
     `;
   } else {
     content.innerHTML = `
-      <h3 style="color: var(--accent); margin-bottom: 5px;">Cardiff to Southampton (Jonny, Emily, Ezra, Maya)</h3>
+      <h3 style="color: var(--accent); margin-bottom: 5px;">Cardiff to Southampton (Cardiff)</h3>
       <p>Distance: ~135 miles (approx 2.5 hours driving)</p>
       <ul>
         <li><strong>Drive:</strong> Take M4 East to A34 South. Easiest route, book CPS port parking in advance.</li>
@@ -406,7 +415,7 @@ window.initMap = function() {
 
   // Custom Viking Longboat / Ship SVG
   const vikingShipIcon = {
-    url: 'data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M 45 15 L 45 60 L 80 60 L 75 15 Z" fill="%23f8fafc" stroke="%23d4af37" stroke-width="2"/><rect x="42" y="10" width="4" height="60" fill="%23d4af37"/><path d="M 10 50 C 10 30, 20 20, 20 20 C 20 20, 15 35, 20 55 C 30 75, 70 75, 80 55 C 85 35, 80 20, 80 20 C 80 20, 90 30, 90 50 C 90 80, 50 90, 10 50" fill="%23d4af37"/><circle cx="35" cy="62" r="4" fill="%23ef4444"/><circle cx="45" cy="64" r="4" fill="%232dd4bf"/><circle cx="55" cy="64" r="4" fill="%23ef4444"/><circle cx="65" cy="62" r="4" fill="%232dd4bf"/></svg>',
+    url: 'data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M 45 15 L 45 60 L 80 60 L 75 15 Z" fill="%23f8fafc" stroke="%23d4af37" stroke-width="2"/><rect x="42" y="10" width="4" height="60" fill="%23d4af37"/><path d="M 15 20 Q 15 50 30 65 L 70 65 Q 85 50 85 20 Q 95 50 75 75 L 25 75 Q 5 50 15 20 Z" fill="%23d4af37"/><circle cx="35" cy="68" r="4" fill="%23ef4444"/><circle cx="45" cy="68" r="4" fill="%232dd4bf"/><circle cx="55" cy="68" r="4" fill="%23ef4444"/><circle cx="65" cy="68" r="4" fill="%232dd4bf"/></svg>',
     scaledSize: new google.maps.Size(48, 48),
     anchor: new google.maps.Point(24, 24)
   };
