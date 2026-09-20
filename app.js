@@ -165,6 +165,8 @@ const deckPlans = [
 
 // App State
 let selectedDayIndex = 0;
+let previousDayIndex = 0;
+let shipAnimFrameId = null;
 let activeLogisticsTab = 'greenfield';
 let jonnyPantsUsed = parseInt(localStorage.getItem('jonny_pants') || '0');
 const JONNY_PANTS_TOTAL = 14;
@@ -221,7 +223,9 @@ function renderDayList() {
 }
 
 function selectDay(idx) {
+  const prevIdx = selectedDayIndex;
   selectedDayIndex = idx;
+  previousDayIndex = prevIdx;
   renderDayList();
   
   const day = cruiseData[idx];
@@ -261,11 +265,9 @@ function selectDay(idx) {
   `;
   document.getElementById('day-details-card').innerHTML = detailHtml;
 
-// Move the ship
+  // Move the ship smoothly along realistic coastal/fjord waypoints
   if (window.gmap && window.shipMarker) {
-    const endPos = new google.maps.LatLng(day.lat, day.lng);
-    gmap.panTo(endPos);
-    window.shipMarker.setPosition(endPos);
+    animateShipToDay(prevIdx, idx);
   }
 
   // Attempt to fetch live weather
@@ -430,17 +432,17 @@ window.initMap = function() {
 
   // Coastal / Fjord Route Waypoints (Avoiding straight lines over land)
   window.realisticRoute = [
-    {lat: 50.897, lng: -1.404}, // Southampton
+    {lat: 50.897, lng: -1.404, day: 0}, // Southampton
     {lat: 50.7, lng: -1.0},
     {lat: 50.6, lng: 0.1},      // English Channel
     {lat: 51.0, lng: 1.2},
     {lat: 51.5, lng: 2.0},      // North Sea South
     {lat: 52.5, lng: 2.5},
-    {lat: 54.5, lng: 3.5},      // North Sea Mid
+    {lat: 54.5, lng: 3.5, day: 1}, // North Sea Mid (Day 1: At Sea)
     {lat: 56.5, lng: 4.0},
     {lat: 58.2, lng: 5.2},      // Approaching Norway
     {lat: 58.6, lng: 5.4},
-    {lat: 58.9699, lng: 5.7331},// Stavanger
+    {lat: 58.9699, lng: 5.7331, day: 2}, // Day 2: Stavanger
     {lat: 59.2, lng: 5.1},      // Coastal turning point
     {lat: 59.7, lng: 5.0},
     {lat: 60.5, lng: 4.8},
@@ -450,24 +452,25 @@ window.initMap = function() {
     {lat: 61.9, lng: 5.5},
     {lat: 61.9, lng: 6.0},
     {lat: 61.85, lng: 6.5},
-    {lat: 61.833, lng: 6.816},  // Olden
+    {lat: 61.833, lng: 6.816, day: 3},  // Day 3: Olden
     {lat: 61.85, lng: 6.5},     // Exiting Nordfjord
     {lat: 61.9, lng: 5.1},
     {lat: 62.1, lng: 4.9},      // Coast Northbound
     {lat: 62.4, lng: 5.3},
-    {lat: 62.472, lng: 6.154},  // Ålesund / Hellesylt
+    {lat: 62.472, lng: 6.154, day: 4},  // Day 4: Ålesund / Hellesylt
     {lat: 62.4, lng: 5.3},      // Coast Southbound
     {lat: 62.1, lng: 4.9},
     {lat: 61.0, lng: 4.5},
     {lat: 59.7, lng: 5.0},
-    {lat: 59.413, lng: 5.268},  // Haugesund
+    {lat: 59.413, lng: 5.268, day: 5},  // Day 5: Haugesund
     {lat: 58.0, lng: 4.5},      // At Sea Southbound
     {lat: 56.0, lng: 3.5},
+    {lat: 55.0, lng: 2.0, day: 6},      // Day 6: At Sea
     {lat: 53.0, lng: 2.5},
     {lat: 51.5, lng: 1.8},
     {lat: 51.0, lng: 1.0},
     {lat: 50.7, lng: 0.0},
-    {lat: 50.897, lng: -1.404}, // Southampton
+    {lat: 50.897, lng: -1.404, day: 7}  // Day 7: Southampton
   ];
 
   const routePath = new google.maps.Polyline({
@@ -480,24 +483,116 @@ window.initMap = function() {
   });
   routePath.setMap(window.gmap);
 
-  cruiseData.forEach((d) => {
+  cruiseData.forEach((d, idx) => {
     if (d.port !== 'At Sea') {
-      new google.maps.Marker({
+      const m = new google.maps.Marker({
         position: { lat: d.lat, lng: d.lng },
         map: window.gmap,
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
-          scale: 5,
+          scale: 6,
           fillColor: '#38bdf8',
           fillOpacity: 1,
           strokeColor: '#0b1320',
-          strokeWeight: 2
+          strokeWeight: 2.5
         },
-        title: d.port
+        title: d.port,
+        cursor: 'pointer'
+      });
+      m.addListener('click', () => {
+        selectDay(idx);
       });
     }
   });
 };
+
+// Helper: Interpolate coordinate along multi-waypoint path
+function interpolatePath(path, progress) {
+  if (!path || path.length === 0) return { lat: 50.897, lng: -1.404 };
+  if (path.length === 1 || progress <= 0) return { lat: path[0].lat, lng: path[0].lng };
+  if (progress >= 1) return { lat: path[path.length - 1].lat, lng: path[path.length - 1].lng };
+
+  let totalLen = 0;
+  const segLens = [];
+  for (let i = 0; i < path.length - 1; i++) {
+    const dLat = path[i + 1].lat - path[i].lat;
+    const dLng = path[i + 1].lng - path[i].lng;
+    const len = Math.hypot(dLat, dLng);
+    segLens.push(len);
+    totalLen += len;
+  }
+
+  const targetLen = totalLen * progress;
+  let accum = 0;
+  for (let i = 0; i < segLens.length; i++) {
+    if (accum + segLens[i] >= targetLen || i === segLens.length - 1) {
+      const segProgress = segLens[i] === 0 ? 0 : (targetLen - accum) / segLens[i];
+      const p1 = path[i];
+      const p2 = path[i + 1];
+      return {
+        lat: p1.lat + (p2.lat - p1.lat) * segProgress,
+        lng: p1.lng + (p2.lng - p1.lng) * segProgress
+      };
+    }
+    accum += segLens[i];
+  }
+  return { lat: path[path.length - 1].lat, lng: path[path.length - 1].lng };
+}
+
+// Smooth animated gliding transition between itinerary days
+function animateShipToDay(fromIdx, toIdx) {
+  if (!window.shipMarker || !window.gmap) return;
+  if (fromIdx === toIdx) return;
+
+  if (shipAnimFrameId) {
+    cancelAnimationFrame(shipAnimFrameId);
+    shipAnimFrameId = null;
+  }
+
+  const route = window.realisticRoute || [];
+  const idxA = route.findIndex(p => p.day === fromIdx);
+  const idxB = route.findIndex(p => p.day === toIdx);
+
+  let path;
+  if (idxA !== -1 && idxB !== -1) {
+    path = idxA < idxB
+      ? route.slice(idxA, idxB + 1)
+      : [...route.slice(idxB, idxA + 1)].reverse();
+  } else {
+    path = [
+      { lat: cruiseData[fromIdx]?.lat || 50.897, lng: cruiseData[fromIdx]?.lng || -1.404 },
+      { lat: cruiseData[toIdx]?.lat || 50.897, lng: cruiseData[toIdx]?.lng || -1.404 }
+    ];
+  }
+
+  // Smoothly pan camera towards destination once, without frame thrashing
+  const destPos = new google.maps.LatLng(cruiseData[toIdx].lat, cruiseData[toIdx].lng);
+  window.gmap.panTo(destPos);
+
+  const duration = 2200; // 2.2 seconds of graceful sailing along the fjords
+  const startTime = performance.now();
+
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    
+    // Smooth cubic ease-in-out
+    const easeProgress = progress < 0.5
+      ? 4 * progress * progress * progress
+      : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+    const pos = interpolatePath(path, easeProgress);
+    window.shipMarker.setPosition(new google.maps.LatLng(pos.lat, pos.lng));
+
+    if (progress < 1) {
+      shipAnimFrameId = requestAnimationFrame(step);
+    } else {
+      shipAnimFrameId = null;
+    }
+  }
+
+  shipAnimFrameId = requestAnimationFrame(step);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   initApp();
