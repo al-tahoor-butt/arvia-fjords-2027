@@ -394,6 +394,37 @@ document.getElementById('deck-search')?.addEventListener('input', (e) => {
   renderDeckPlan(e.target.value);
 });
 
+// --- Map View Switcher: Itinerary Route vs Live AIS Marine Radar ---
+window.switchMapView = function(view) {
+  const routeBtn = document.getElementById('tab-route-view');
+  const radarBtn = document.getElementById('tab-radar-view');
+  const mapContainer = document.getElementById('map-container');
+  const radarContainer = document.getElementById('live-radar-container');
+
+  if (view === 'radar') {
+    if (routeBtn) routeBtn.classList.remove('active');
+    if (radarBtn) radarBtn.classList.add('active');
+    if (mapContainer) mapContainer.style.display = 'none';
+    if (radarContainer) {
+      radarContainer.style.display = 'block';
+    }
+  } else {
+    if (radarBtn) radarBtn.classList.remove('active');
+    if (routeBtn) routeBtn.classList.add('active');
+    if (radarContainer) radarContainer.style.display = 'none';
+    if (mapContainer) {
+      mapContainer.style.display = 'block';
+      if (window.gmap) {
+        google.maps.event.trigger(window.gmap, 'resize');
+        const curData = cruiseData[selectedDayIndex];
+        if (curData) {
+          window.gmap.panTo({ lat: curData.lat, lng: curData.lng });
+        }
+      }
+    }
+  }
+};
+
 // --- Map Logic ---
 window.initMap = function() {
   const ph = document.getElementById('map-placeholder');

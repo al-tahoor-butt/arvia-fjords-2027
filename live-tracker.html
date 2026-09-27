@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Marine Radar - P&O Arvia</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #080d14;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #94a3b8;
+    }
+    #radar-mount {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: #080d14;
+    }
+    #radar-mount iframe {
+      width: 100% !important;
+      height: 100% !important;
+      border: 0 !important;
+      display: block;
+    }
+    .radar-toolbar {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 9999;
+      background: rgba(18, 28, 41, 0.9);
+      backdrop-filter: blur(8px);
+      border: 1px solid #23344a;
+      border-radius: 6px;
+      padding: 4px 6px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    .radar-btn {
+      background: transparent;
+      border: 1px solid #23344a;
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .radar-btn:hover {
+      background: rgba(212, 175, 55, 0.15);
+      border-color: #d4af37;
+      color: #d4af37;
+    }
+    .radar-btn.active {
+      background: #d4af37;
+      border-color: #d4af37;
+      color: #080d14;
+    }
+    .loading-notice {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #080d14;
+      color: #cbd5e1;
+      gap: 12px;
+      z-index: 100;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(212, 175, 55, 0.2);
+      border-top-color: #d4af37;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .fallback-container {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #080d14;
+      padding: 24px 20px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 500;
+    }
+    .fallback-container h3 {
+      color: #d4af37;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+    .fallback-container p {
+      font-size: 13px;
+      color: #94a3b8;
+      max-width: 440px;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+    .fallback-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .fallback-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #121c29;
+      color: #f8fafc;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: 1px solid #23344a;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .fallback-link:hover {
+      border-color: #d4af37;
+      color: #d4af37;
+      background: #1a2a3d;
+    }
+  </style>
+</head>
+<body>
+  <div class="radar-toolbar">
+    <button id="btn-mt" class="radar-btn active" onclick="loadSource('marinetraffic')">MarineTraffic</button>
+    <button id="btn-vf" class="radar-btn" onclick="loadSource('vesselfinder')">VesselFinder</button>
+  </div>
+
+  <div id="radar-mount">
+    <div id="loading-notice" class="loading-notice">
+      <div class="spinner"></div>
+      <div style="font-size: 13px;">Connecting to Live Satellite AIS (P&O Arvia)...</div>
+    </div>
+
+    <div id="fallback-box" class="fallback-container">
+      <div style="font-size: 36px; margin-bottom: 10px;">🛰️</div>
+      <h3>Live AIS Radar Feeds</h3>
+      <p>
+        If the embedded frame is paused or restricted by your browser/ad-blocker, you can track P&O Arvia's live location and speed directly:
+      </p>
+      <div class="fallback-actions">
+        <a class="fallback-link" href="https://www.marinetraffic.com/en/ais/details/ships/shipid:7147743/mmsi:232039750/imo:9849693/vessel:ARVIA" target="_blank" rel="noopener">
+          🛳️ Open on MarineTraffic
+        </a>
+        <a class="fallback-link" href="https://www.vesselfinder.com/vessels/details/9849693" target="_blank" rel="noopener">
+          🧭 Open on VesselFinder
+        </a>
+        <a class="fallback-link" href="https://www.cruisemapper.com/?imo=9849693" target="_blank" rel="noopener">
+          🗺️ Open on CruiseMapper
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentSource = 'marinetraffic';
+    let checkTimeout = null;
+
+    function hideLoader() {
+      const loader = document.getElementById('loading-notice');
+      if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => { loader.style.display = 'none'; }, 400);
+      }
+    }
+
+    function showLoader(text) {
+      const loader = document.getElementById('loading-notice');
+      if (loader) {
+        loader.style.display = 'flex';
+        loader.style.opacity = '1';
+        if (text) {
+          loader.querySelector('div:last-child').textContent = text;
+        }
+      }
+      document.getElementById('fallback-box').style.display = 'none';
+    }
+
+    function showFallback() {
+      hideLoader();
+      document.getElementById('fallback-box').style.display = 'flex';
+    }
+
+    function loadSource(source) {
+      currentSource = source;
+      document.getElementById('btn-mt').classList.toggle('active', source === 'marinetraffic');
+      document.getElementById('btn-vf').classList.toggle('active', source === 'vesselfinder');
+
+      if (checkTimeout) clearTimeout(checkTimeout);
+
+      // Clean existing iframe
+      const oldIframe = document.querySelector('#radar-mount > iframe');
+      if (oldIframe) oldIframe.remove();
+
+      showLoader(source === 'marinetraffic' ? 'Loading MarineTraffic Live AIS...' : 'Loading VesselFinder Live AIS...');
+
+      const iframe = document.createElement('iframe');
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.border = '0';
+      iframe.allow = 'fullscreen';
+
+      if (source === 'marinetraffic') {
+        iframe.src = 'https://www.marinetraffic.com/en/ais/embed/zoom:5/centery:58.0/centerx:2.0/maptype:1/shownames:false/mmsi:232039750/';
+      } else {
+        iframe.src = 'https://www.vesselfinder.com/aismap?mmsi=232039750&track=true';
+      }
+
+      iframe.onload = () => {
+        hideLoader();
+      };
+      iframe.onerror = () => {
+        showFallback();
+      };
+
+      document.getElementById('radar-mount').appendChild(iframe);
+
+      // 4-second safety timeout to reveal map once frames begin streaming
+      checkTimeout = setTimeout(() => {
+        hideLoader();
+      }, 4000);
+    }
+
+    // Default load MarineTraffic
+    loadSource('marinetraffic');
+  </script>
+</body>
+</html>
