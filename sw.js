@@ -1,4 +1,4 @@
-const CACHE_NAME = 'arvia-fjords-v4';
+const CACHE_NAME = 'arvia-fjords-v5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

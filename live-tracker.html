@@ -17,23 +17,23 @@
       flex-direction: column;
     }
     .radar-top-bar {
-      height: 42px;
-      background: #111c2a;
+      height: 44px;
+      background: #0f172a;
       border-bottom: 1px solid #23344a;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 12px;
+      padding: 0 14px;
       flex-shrink: 0;
       z-index: 1000;
     }
     .radar-vessel-title {
-      font-size: 12.5px;
+      font-size: 13px;
       font-weight: 700;
       color: #d4af37;
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 8px;
     }
     .radar-pulse-beacon {
       display: inline-block;
@@ -41,7 +41,7 @@
       height: 8px;
       border-radius: 50%;
       background: #10b981;
-      box-shadow: 0 0 6px #10b981;
+      box-shadow: 0 0 8px #10b981;
       animation: pulse-ring 1.8s infinite;
     }
     @keyframes pulse-ring {
@@ -52,34 +52,12 @@
     .radar-controls {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
-    .radar-btn {
-      background: rgba(0, 0, 0, 0.4);
+    .radar-quick-link {
+      background: rgba(18, 28, 41, 0.85);
       border: 1px solid #23344a;
       color: #cbd5e1;
-      font-size: 11.5px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .radar-btn:hover {
-      background: rgba(212, 175, 55, 0.15);
-      border-color: #d4af37;
-      color: #d4af37;
-    }
-    .radar-btn.active {
-      background: #d4af37;
-      border-color: #d4af37;
-      color: #080d14;
-      font-weight: 700;
-    }
-    .radar-btn-ext {
-      background: rgba(45, 212, 191, 0.1);
-      border: 1px solid rgba(45, 212, 191, 0.35);
-      color: #2dd4bf;
       font-size: 11.5px;
       font-weight: 600;
       padding: 4px 10px;
@@ -88,16 +66,17 @@
       transition: all 0.2s;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
     }
-    .radar-btn-ext:hover {
-      background: rgba(45, 212, 191, 0.25);
-      color: #fff;
+    .radar-quick-link:hover {
+      background: rgba(212, 175, 55, 0.2);
+      border-color: #d4af37;
+      color: #d4af37;
     }
     #radar-mount {
       flex: 1;
       width: 100%;
-      height: calc(100% - 42px);
+      height: calc(100% - 44px);
       position: relative;
       background: #080d14;
     }
@@ -187,13 +166,17 @@
   <div class="radar-top-bar">
     <div class="radar-vessel-title">
       <span class="radar-pulse-beacon"></span>
-      P&O Arvia &bull; MMSI: 232039750
+      P&O Arvia Live Radar &bull; MMSI: 232039750
     </div>
     <div class="radar-controls">
-      <button id="btn-mt" class="radar-btn active" onclick="loadSource('marinetraffic')">MarineTraffic</button>
-      <button id="btn-vf" class="radar-btn" onclick="loadSource('vesselfinder')">VesselFinder</button>
-      <a id="btn-ext-link" href="https://www.marinetraffic.com/en/ais/details/ships/shipid:6892550/mmsi:232039750/imo:9849693/vessel:ARVIA" target="_blank" rel="noopener" class="radar-btn-ext" title="Open directly in full window">
-        Direct Feed &nearr;
+      <a href="https://www.marinetraffic.com/en/ais/details/ships/shipid:6892550/mmsi:232039750/imo:9849693/vessel:ARVIA" target="_blank" rel="noopener" class="radar-quick-link" title="Open MarineTraffic Vessel Details">
+        MarineTraffic ↗
+      </a>
+      <a href="https://www.vesselfinder.com/vessels/details/9849693" target="_blank" rel="noopener" class="radar-quick-link" title="Open VesselFinder Live Satellite Tracker">
+        VesselFinder ↗
+      </a>
+      <a href="https://www.cruisemapper.com/?imo=9849693" target="_blank" rel="noopener" class="radar-quick-link" style="border-color: rgba(45, 212, 191, 0.4); color: #2dd4bf;" title="Open CruiseMapper Itinerary & Speed">
+        CruiseMapper ↗
       </a>
     </div>
   </div>
@@ -201,14 +184,22 @@
   <div id="radar-mount">
     <div id="loading-notice" class="loading-notice">
       <div class="spinner"></div>
-      <div id="loading-text" style="font-size: 13px;">Connecting to Live Satellite AIS (P&O Arvia)...</div>
+      <div id="loading-text" style="font-size: 13px;">Targeting P&O Arvia on Live AIS Radar (trackvessel: 232039750)...</div>
     </div>
+
+    <!-- MarineTraffic Live Vessel Tracker configured with trackvessel:232039750 -->
+    <iframe 
+      id="marine-traffic-frame"
+      src="https://www.marinetraffic.com/en/ais/embed/zoom:7/centery:49.0/centerx:-4.0/maptype:1/shownames:true/trackvessel:232039750/"
+      allowfullscreen
+      loading="lazy">
+    </iframe>
 
     <div id="fallback-box" class="fallback-container">
       <div style="font-size: 36px; margin-bottom: 10px;">🛰️</div>
-      <h3>Live AIS Radar Feeds</h3>
+      <h3>Live Satellite AIS Feeds</h3>
       <p>
-        If your browser or an ad-blocker restricts third-party embedded map frames, you can track P&O Arvia's live location and speed directly:
+        If your browser or an ad-blocker pauses the embedded radar, you can track P&O Arvia directly on the verified satellite networks:
       </p>
       <div class="fallback-actions">
         <a class="fallback-link" href="https://www.marinetraffic.com/en/ais/details/ships/shipid:6892550/mmsi:232039750/imo:9849693/vessel:ARVIA" target="_blank" rel="noopener">
@@ -225,83 +216,28 @@
   </div>
 
   <script>
-    let currentSource = 'marinetraffic';
-    let checkTimeout = null;
+    const iframe = document.getElementById('marine-traffic-frame');
+    const loader = document.getElementById('loading-notice');
 
     function hideLoader() {
-      const loader = document.getElementById('loading-notice');
       if (loader) {
         loader.style.opacity = '0';
         setTimeout(() => { loader.style.display = 'none'; }, 400);
       }
     }
 
-    function showLoader(text) {
-      const loader = document.getElementById('loading-notice');
-      if (loader) {
-        loader.style.display = 'flex';
-        loader.style.opacity = '1';
-        if (text) {
-          document.getElementById('loading-text').textContent = text;
-        }
-      }
-      document.getElementById('fallback-box').style.display = 'none';
-    }
-
-    function showFallback() {
-      hideLoader();
-      document.getElementById('fallback-box').style.display = 'flex';
-    }
-
-    function loadSource(source) {
-      currentSource = source;
-      document.getElementById('btn-mt').classList.toggle('active', source === 'marinetraffic');
-      document.getElementById('btn-vf').classList.toggle('active', source === 'vesselfinder');
-
-      const extLink = document.getElementById('btn-ext-link');
-      if (extLink) {
-        if (source === 'marinetraffic') {
-          extLink.href = 'https://www.marinetraffic.com/en/ais/details/ships/shipid:6892550/mmsi:232039750/imo:9849693/vessel:ARVIA';
-        } else {
-          extLink.href = 'https://www.vesselfinder.com/vessels/details/9849693';
-        }
-      }
-
-      if (checkTimeout) clearTimeout(checkTimeout);
-
-      const oldIframe = document.querySelector('#radar-mount > iframe');
-      if (oldIframe) oldIframe.remove();
-
-      showLoader(source === 'marinetraffic' ? 'Loading MarineTraffic Live AIS...' : 'Loading VesselFinder Live AIS...');
-
-      const iframe = document.createElement('iframe');
-      iframe.style.width = '100%';
-      iframe.style.height = '100%';
-      iframe.style.border = '0';
-      iframe.allow = 'fullscreen';
-
-      if (source === 'marinetraffic') {
-        iframe.src = 'https://www.marinetraffic.com/en/ais/embed/showmenu:false/shownames:false/mmsi:232039750/';
-      } else {
-        iframe.src = 'https://www.vesselfinder.com/aismap?mmsi=232039750&track=true';
-      }
-
+    if (iframe) {
       iframe.onload = () => {
         hideLoader();
       };
       iframe.onerror = () => {
-        showFallback();
-      };
-
-      document.getElementById('radar-mount').appendChild(iframe);
-
-      checkTimeout = setTimeout(() => {
         hideLoader();
-      }, 4000);
+        document.getElementById('fallback-box').style.display = 'flex';
+      };
     }
 
-    // Default load MarineTraffic
-    loadSource('marinetraffic');
+    // Safety timeout: dismiss spinner after 3.5s so map is fully interactive
+    setTimeout(hideLoader, 3500);
   </script>
 </body>
 </html>
